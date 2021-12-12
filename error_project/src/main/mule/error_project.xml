@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9666d156-9052-4aad-b240-3a72658d87e2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="1063202a-aff2-4b09-8d13-ffff6d89bc96" />
+	<sftp:config name="SFTP_Config" doc:name="SFTP Config" doc:id="56dfae21-4144-4ad3-bac0-66c2c5695a5a" >
+		<sftp:connection host="192.168.43.168" username="tester" password="password" />
+	</sftp:config>
+	<flow name="error_projectFlow" doc:id="c1c4427a-7ff5-479c-a08e-4d6304efd19e" >
+		<http:listener doc:name="Listener" doc:id="9cb18d6d-187b-46d2-b826-9605cefd6843" config-ref="HTTP_Listener_config" path="/eproject">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="fe457609-a8f9-4533-8ef4-6393281419d8" message="flow start:::"/>
+		<choice doc:name="Choice" doc:id="a37c9438-f9ab-44ef-837b-a6a03880d20f" >
+			<when expression="#[payload != null]">
+				<logger level="INFO" doc:name="failure Logger" doc:id="55285d63-e5c8-4812-8eed-eadbc7e63632" />
+				<raise-error doc:name="Raise error" doc:id="257fdf0c-c683-42ac-8014-e27e270a472f" type="DETAILS:NOT_ FOUND" description="CUSTOM LEVEL ERROR"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="success Logger" doc:id="455aa481-d896-4440-8282-74315d6d8aa0" />
+			</otherwise>
+		</choice>
+		<file:read doc:name="Read" doc:id="17e50024-4771-4ed6-8664-948c56b288f6" config-ref="File_Config" path="C:\Users\suneel\Downloads\Sample.csv" />
+		<sftp:read doc:name="Read" doc:id="1dff3140-ad6d-4767-ae7c-fd5e43c53fdd" config-ref="SFTP_Config" path="/qwertyu" />
+		<logger level="INFO" doc:name="Logger" doc:id="e2da173e-c237-42fc-b65b-44e0c70fb6ff" message="#[payload123]"/>
+		<error-handler ref="common__error_hamdlerError_Handler" />
+	</flow>
+</mule>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="common__error_hamdlerError_Handler" doc:id="692a218c-ca91-49a9-96dd-104de047f724" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b0d7f744-876e-4677-928e-6c27b6f90e3e" type="EXPRESSION" >
+			<ee:transform doc:name="Transform Message" doc:id="77ce8bbc-76e8-44fa-abf1-7b7c16bd679d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"error type":"code/api level issue",
+	"status code":403
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="499e9b85-cec8-446c-9bc0-7c6400845564" type="FILE:ILLEGAL_PATH">
+			<ee:transform doc:name="Transform Message" doc:id="d8f6f938-1c13-41e5-919b-19c471b0a3a1">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"error type":"sftp level issue",
+	"status code":401
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="91a4aa06-6f8c-4701-9e89-c11b27166052" type="SFTP:ILLEGAL_PATH">
+			<ee:transform doc:name="Transform Message" doc:id="2eb0934f-b8c1-46b4-8ad2-6058afd929c0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"error type":"sftp12345678 level issue",
+	"status code":401
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="038ee3ec-cecd-47b6-9fe8-931453f07e3e" type="DETAILS:NOT_ FOUND">
+			<ee:transform doc:name="Transform Message" doc:id="831aaf76-3940-4b17-9add-ed7dd3208c9b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"some custom level error":"error type"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>
